@@ -69,7 +69,7 @@ class ComplexUILayout(QWidget):
         welcome_label = QLabel(f"Welcome back, {username}!", self.welcome_rectangle)
         welcome_label.setAlignment(Qt.AlignCenter)
         welcome_label.setFont(QFont('Monaco', 25, QFont.Bold)) 
-        welcome_label.setStyleSheet("font-family: 'Monaco';"
+        welcome_label.setStyleSheet("font-family: 'Arial';"
                 "font-size: 25pt;" 
                 "font-weight: bold;"
                 "color: white;") 
@@ -110,7 +110,7 @@ class ComplexUILayout(QWidget):
         right_stack_hbox.addWidget(clock_widget)
         second_column.addLayout(right_stack_hbox)
 
-        kill_process_rectangle = RectanglePlaceholder(self.width, 175)
+        kill_process_rectangle = RectanglePlaceholder(self.width, 155)
         kill_process_label = QLabel("Enter the process you want to kill", kill_process_rectangle)
         kill_process = KillerApp()
         kill_process_rectangle.inner_layout.addWidget(kill_process_label)
@@ -182,7 +182,7 @@ class ComplexUILayout(QWidget):
                                         "border-radius: 10px;"
                                         "color: white")
             
-
+  
 
     def dark_theme(self):
         self.setStyleSheet("""
@@ -192,6 +192,7 @@ class ComplexUILayout(QWidget):
             QPushButton {
                 background-color: #555555;
                 color: white;
+                border-radius: 14px;
             }
             QTableWidget {
                 background-color: transparent;
@@ -226,6 +227,15 @@ class ComplexUILayout(QWidget):
                 font-size: 14pt; 
                 font-weight: bold;
                 color: #E7D5F6;
+            }
+            QLineEdit {
+                border: 1px solid #D9D9D9;
+                border-radius: 10px;
+                padding: 0 8px;
+                background: #3E3E3E;
+                selection-background-color: darkgray;
+                font-size: 16pt;
+                color: #555;         
             }
 
         """)
@@ -277,6 +287,15 @@ class ComplexUILayout(QWidget):
                 font-size: 14pt; 
                 font-weight: bold;
                 color: #562680;
+            }
+            QLineEdit {
+                border: 1px solid #D9D9D9;
+                border-radius: 10px;
+                padding: 0 8px;
+                background: white;
+                selection-background-color: darkgray;
+                font-size: 16pt;
+                color: #555;         
             }
             """)
 

@@ -16,12 +16,12 @@ class KillerApp(QWidget):
 
         # QLineEdit for PID input
         self.pidInput = QLineEdit(self)
-        self.pidInput.setFixedSize(400, 40)
+        self.pidInput.setFixedSize(400, 30)
         layout.addWidget(self.pidInput)
 
         # QPushButton to kill the process
         self.killButton = QPushButton('Kill Process', self)
-        self.killButton.setFixedSize(150, 50)
+        self.killButton.setFixedSize(150, 40)
         self.killButton.clicked.connect(self.killProcess)
 
         layout.addWidget(self.killButton, 0, Qt.AlignCenter)

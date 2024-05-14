@@ -17,8 +17,8 @@ class ThemeSwitch(QWidget):
         self.setWindowTitle('Advanced Theme Switch')
         self.setStyleSheet("background-color: white;") 
         
-        self.moon_icon = QIcon(QPixmap("/Users/kamilla/Desktop/ML/sp_project/assets/moon_grey.png"))
-        self.sun_icon = QIcon(QPixmap("/Users/kamilla/Desktop/ML/sp_project/assets/sun_purple.png")) # Set default background to a neutral color
+        self.moon_icon = QIcon(QPixmap("/Users/apple/Desktop/sp_project/assets/moon_grey.png"))
+        self.sun_icon = QIcon(QPixmap("/Users/apple/Desktop/sp_project/assets/sun_purple.png")) # Set default background to a neutral color
 
         self.toggle_button.setFixedSize(40, 40)
         self.toggle_button.setStyleSheet("QPushButton {"
@@ -42,8 +42,8 @@ class ThemeSwitch(QWidget):
         self.animation_timer.start(10)  # Start or restart the animation timer
 
     def dark_theme(self):
-        self.moon_icon = QIcon(QPixmap("/Users/kamilla/Desktop/ML/sp_project/assets/moon_purple.png"))
-        self.sun_icon = QIcon(QPixmap("/Users/kamilla/Desktop/ML/sp_project/assets/sun_grey.png"))
+        self.moon_icon = QIcon(QPixmap("/Users/apple/Desktop/sp_project/assets/moon_purple.png"))
+        self.sun_icon = QIcon(QPixmap("/Users/apple/Desktop/sp_project/assets/sun_grey.png"))
         self.toggle_button.setStyleSheet("QPushButton {"
                                          "border: none;"
                                          "background-color: #3E3E3E;"
@@ -52,8 +52,8 @@ class ThemeSwitch(QWidget):
         self.toggle_button.setIcon(self.moon_icon)
     
     def light_theme(self):
-        self.moon_icon = QIcon(QPixmap("/Users/kamilla/Desktop/ML/sp_project/assets/moon_grey.png"))
-        self.sun_icon = QIcon(QPixmap("/Users/kamilla/Desktop/ML/sp_project/assets/sun_purple.png"))
+        self.moon_icon = QIcon(QPixmap("/Users/apple/Desktop/sp_project/assets/moon_grey.png"))
+        self.sun_icon = QIcon(QPixmap("/Users/apple/Desktop/sp_project/assets/sun_purple.png"))
         self.toggle_button.setStyleSheet("QPushButton {"
                                          "border: none;"
                                          "background-color: white;"

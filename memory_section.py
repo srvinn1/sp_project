@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import QTimer, QSize
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
+import collections
 
 class TopMemoryProcessesWidget(QWidget):
     def __init__(self):
@@ -65,52 +66,45 @@ class TopMemoryProcessesWidget(QWidget):
                 continue
 
 class MemoryUsagePlotWidget(QWidget):
-    def __init__(self,width,height):
+    def __init__(self, width, height):
         super().__init__()
         self.setMinimumSize(width, height)
-        # Create a figure
-        self.figure, self.ax = plt.subplots(figsize=(5, 3))  # Adjust the figsize as needed
+        self.figure, self.ax = plt.subplots(figsize=(5, 3))
         self.canvas = FigureCanvas(self.figure)
+        self.ax.set_title('Memory Usage (%)', fontsize=9, color='#562680')
 
-        # Set the title and labels with smaller font size
-        self.ax.set_title('Memory Usage (%)', fontsize=9, color = '#562680')  # Set font size for the title
-        #self.ax.set_xlabel('Time (s)', fontsize=9)        # Set font size for the x-label
-        #self.ax.set_ylabel('Usage (%)', fontsize=9)       # Set font size for the y-label
-
-        # Initialize empty data
-        self.times = []
-        self.memory_usages = []
+        # Initialize data storage with a fixed window size of 60 seconds
+        self.times = collections.deque(maxlen=60)  # Time in seconds
+        self.memory_usages = collections.deque(maxlen=60)  # Memory usages in percent
 
         # Set up a timer to update the plot every second
         self.timer = self.startTimer(1000)
 
-        # Add canvas to layout
+        # Layout settings
         layout = QVBoxLayout()
         layout.addWidget(self.canvas)
         self.setLayout(layout)
+        self.start_time = 0  # Start a counter from 0
 
     def timerEvent(self, event):
-        # Get current memory usage
+        # Fetch current memory usage percentage
         memory_usage = psutil.virtual_memory().percent
 
-        # Append the current time and memory usage to the data lists
-        self.times.append(len(self.times) + 1)
+        # Append new data to the deques
+        self.start_time += 1  # Increment the start time
+        self.times.append(self.start_time)
         self.memory_usages.append(memory_usage)
 
-        # Clear previous plot
+        # Clear the existing plot and redraw
         self.ax.clear()
+        self.ax.plot(list(self.times), list(self.memory_usages), color='#000080')
+        self.ax.set_title('Memory Usage (%)', fontsize=9, color='#562680')
 
-        # Plot memory usage
-        self.ax.plot(self.times, self.memory_usages, color='#000080')
+        # Dynamic adjustment of the x-axis and y-axis
+        #self.ax.set_ylim(0, 100)  # Fixed y-axis for percentage
+        if len(self.times) > 1:
+            self.ax.set_xlim(max(0, self.start_time - 60), self.start_time)  # Adjust x-axis to show last 60 seconds
+        self.ax.xaxis.set_visible(False)
 
-        # Set title and labels
-        self.ax.set_title('Memory Usage (%)', fontsize=9, color = '#562680')  # Set font size for the title
-        #self.ax.set_xlabel('Time (s)', fontsize=5)        # Set font size for the x-label
-        #self.ax.set_ylabel('Usage (%)', fontsize=5)       # Set font size for the y-label
-
-        # Adjust y-axis to start from the minimum value of memory usage
-        #min_memory_usage = min(self.memory_usages)
-        #self.ax.set_ylim(bottom=min(0, min_memory_usage - 5))  # Set the lower limit of y-axis
-        self.ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{x:.1f}'))
-        # Draw the updated plot
+        # Redraw the canvas
         self.canvas.draw()

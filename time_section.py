@@ -10,7 +10,7 @@ class DigitalClock(QWidget):
         # Create a label to display the time
         self.timeLabel = QLabel(self)
         self.timeLabel.setAlignment(Qt.AlignCenter)
-        self.timeLabel.setStyleSheet("font-size: 20pt; font-weight: 900;")
+        self.timeLabel.setStyleSheet("font-size: 30pt; font-weight: 900; font-family: 'Arial';")
 
         # Set up the layout
         layout = QVBoxLayout()

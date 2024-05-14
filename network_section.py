@@ -7,6 +7,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
 import psutil
 import matplotlib.ticker as ticker
+import collections
 
 class TopNetworkProcessesWidget(QWidget):
     def __init__(self):
@@ -140,53 +141,58 @@ class NetworkMonitorWidget(QWidget):
         self.previous_time = current_time
 
 class NetworkUsagePlotWidget(QWidget):
-    def __init__(self,width,height):
+    def __init__(self, width, height):
         super().__init__()
         self.setMinimumSize(width, height)
-        # Create a figure
-        self.figure, self.ax = plt.subplots(figsize=(5, 3))  # Adjust the figsize as needed
+        self.figure, self.ax = plt.subplots(figsize=(5, 3))
         self.canvas = FigureCanvas(self.figure)
+        self.ax.set_title('Network Usage (KB/s)', fontsize=9, color='#562680')
 
-        # Set the title and labels with smaller font size
-        self.ax.set_title('Network Usage (KB)', fontsize=9, color = '#562680')   # Set font size for the title
-        #self.ax.set_xlabel('Time (s)', fontsize=9)        # Set font size for the x-label
-        #self.ax.set_ylabel('Usage (KB)', fontsize=9)       # Set font size for the y-label
-        # Initialize empty data
-        self.times = []
-        self.network_usages = []
+        # Initialize data storage with a fixed window size of 60 seconds
+        self.times = collections.deque(maxlen=60)  # Time in seconds
+        self.bytes_sent = collections.deque(maxlen=60)  # Bytes sent in kilobytes per second
+        self.bytes_received = collections.deque(maxlen=60)  # Bytes received in kilobytes per second
+
+        self.last_net_io = psutil.net_io_counters()
 
         # Set up a timer to update the plot every second
         self.timer = self.startTimer(1000)
 
-        # Add canvas to layout
+        # Layout settings
         layout = QVBoxLayout()
         layout.addWidget(self.canvas)
         self.setLayout(layout)
+        self.start_time = 0  # Start a counter from 0
 
     def timerEvent(self, event):
-        # Get current network usage
-        network_usage = psutil.net_io_counters().bytes_sent + psutil.net_io_counters().bytes_recv
+        # Fetch current network usage in bytes
+        current_net_io = psutil.net_io_counters()
+        sent_kb = (current_net_io.bytes_sent - self.last_net_io.bytes_sent) / 1024  # Calculate difference and convert to KB
+        received_kb = (current_net_io.bytes_recv - self.last_net_io.bytes_recv) / 1024  # Calculate difference and convert to KB
 
-        # Convert network usage to kilobytes
-        network_usage_kb = network_usage / 1024
+        self.last_net_io = current_net_io  # Update last network io counters
 
-        # Append the current time and network usage to the data lists
-        self.times.append(len(self.times) + 1)
-        self.network_usages.append(network_usage_kb)
+        # Append new data to the deques
+        self.start_time += 1  # Increment the start time
+        self.times.append(self.start_time)
+        self.bytes_sent.append(sent_kb)
+        self.bytes_received.append(received_kb)
 
-        # Clear previous plot
+        # Clear the existing plot and redraw
         self.ax.clear()
+        self.ax.plot(list(self.times), list(self.bytes_sent), label='Bytes Sent', color='#562680')
+        self.ax.plot(list(self.times), list(self.bytes_received), label='Bytes Received', color='pink')
+        self.ax.set_title('Network Usage (KB/s)', fontsize=9, color='#562680')
 
-        # Plot network usage
-        self.ax.plot(self.times, self.network_usages, color='red')
+        # Dynamic adjustment of the x-axis and y-axis
+        self.ax.set_ylim(0, max(max(self.bytes_sent, default=0), max(self.bytes_received, default=0)) + 10)  # Set y-axis based on max usage + some margin
+        if len(self.times) > 1:
+            self.ax.set_xlim(max(0, self.start_time - 60), self.start_time)  # Adjust x-axis to show last 60 seconds
 
-        # Set title and labels
-        self.ax.set_title('Network Usage (KB)', fontsize=9, color = '#562680')    # Set font size for the title
-        #self.ax.set_xlabel('Time (s)', fontsize=5)        # Set font size for the x-label
-        #self.ax.set_ylabel('Usage (KB)', fontsize=5)       # Set font size for the y-label
+        self.ax.xaxis.set_visible(False)
 
-        # Adjust y-axis to start from the minimum value of network usage
-        #min_network_usage = min(self.network_usages)
-        #self.ax.set_ylim(bottom=min(0, min_network_usage - 5))  # Set the lower limit of y-axis
-        # Draw the updated plot
+        # Add legend
+        self.ax.legend()
+
+        # Redraw the canvas
         self.canvas.draw()
