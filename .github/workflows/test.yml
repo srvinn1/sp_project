@@ -1,0 +1,28 @@
+name: Code Quality Checker
+
+on:
+  pull_request:
+    branches: 
+      - main
+
+jobs: 
+  code-quality:
+    runs-on: ubuntu-latest
+    steps: 
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install code quality tools
+        run: |
+          pip install flake8 pylint bandit
+      - name: Run flake8 for linting
+        run: |
+          flake8 . --max-line-length=88  # Customize options as needed
+      - name: Run pylint for static analysis
+        run: |
+          pylint **/*.py
+      - name: Run bandit for security checks
+        run: |
+          bandit -r .
