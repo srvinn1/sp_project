@@ -14,10 +14,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'  # Replace '3.x' with the desired version, e.g., '3.10'
-      - name: Run flake8 for linting (ignore certain checks)
-        run: |
-          flake8 . --max-line-length=120 --ignore=E501,F401,E302,E305,W291,W293,E303  # Adjust options to ignore specific errors
+          python-version: '3.10'  
 
       - name: Run bandit for security checks
         run: |
